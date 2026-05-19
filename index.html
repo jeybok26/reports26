@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monthly Report Submission</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+      color: #444;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+    .success {
+      color: green;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Monthly Report</h2>
+    <form id="reportForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" required>
+
+      <label for="month">Month</label>
+      <select id="month" required>
+        <option value="">Select Month</option>
+        <option>January</option><option>February</option><option>March</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+      </select>
+
+      <div class="checkbox-label">
+        <input type="checkbox" id="participated" required>
+        <label for="participated">Check the box if you shared in any form of the ministry during the month</label>
+      </div>
+      <div id="checkboxError" class="error"></div>
+
+      <label for="bs">BS</label>
+      <input type="text" id="bs">
+
+      <label for="hours">Hours (if auxiliary, regular, or special pioneer or field missionary)</label>
+      <input type="number" id="hours" min="0">
+
+      <label for="comments">Comments</label>
+      <textarea id="comments" rows="3"></textarea>
+
+      <button type="submit">Submit Report</button>
+      <div id="successMessage" class="success"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('reportForm');
+    const checkbox = document.getElementById('participated');
+    const checkboxError = document.getElementById('checkboxError');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      checkboxError.textContent = '';
+      successMessage.textContent = '';
+
+      if (!checkbox.checked) {
+        checkboxError.textContent = 'You must check the participation box before submitting.';
+        return;
+      }
+
+      const data = {
+        name: document.getElementById('name').value,
+        month: document.getElementById('month').value,
+        participated: checkbox.checked ? "Yes" : "No",
+        bs: document.getElementById('bs').value,
+        hours: document.getElementById('hours').value,
+        comments: document.getElementById('comments').value
+      };
+
+      try {
+        // Replace with your Google Apps Script Web App URL
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyCrJZY9e9m0eQODUk8jIROrLGH27QAJ-X23e9hbns6TjhueNKYReCBg-Q35saB8m1S/exec";
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+          successMessage.textContent = "Report submitted successfully!";
+          form.reset();
+        } else {
+          successMessage.textContent = "Error submitting report.";
+        }
+      } catch (error) {
+        successMessage.textContent = "Network error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
