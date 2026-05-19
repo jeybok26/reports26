@@ -5,7 +5,7 @@
   <title>Monthly Report Submission</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
       display: flex;
       justify-content: center;
@@ -78,7 +78,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Monthly Report</h2>
+    <h2>Field Service Report</h2>
     <form id="reportForm">
       <label for="name">Name</label>
       <input type="text" id="name" required>
@@ -98,8 +98,8 @@
       </div>
       <div id="checkboxError" class="error"></div>
 
-      <label for="bs">BS</label>
-      <input type="text" id="bs">
+      <label for="bs">Number of different Bible studies conducted</label>
+      <input type="text" id="bs" required>
 
       <label for="hours">Hours (if auxiliary, regular, or special pioneer or field missionary)</label>
       <input type="number" id="hours" min="0">
@@ -128,32 +128,23 @@
         return;
       }
 
-      const data = {
-        name: document.getElementById('name').value,
-        month: document.getElementById('month').value,
-        participated: checkbox.checked ? "Yes" : "No",
-        bs: document.getElementById('bs').value,
-        hours: document.getElementById('hours').value,
-        comments: document.getElementById('comments').value
-      };
+      const formData = new FormData();
+      formData.append("name", document.getElementById('name').value);
+      formData.append("month", document.getElementById('month').value);
+      formData.append("participated", "Yes"); // always Yes if checked
+      formData.append("bs", document.getElementById('bs').value);
+      formData.append("hours", document.getElementById('hours').value);
+      formData.append("comments", document.getElementById('comments').value);
 
       try {
-        // Replace with your Google Apps Script Web App URL
-        const scriptURL = "https://script.google.com/macros/s/AKfycbyCrJZY9e9m0eQODUk8jIROrLGH27QAJ-X23e9hbns6TjhueNKYReCBg-Q35saB8m1S/exec";
-        const response = await fetch(scriptURL, {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: { 'Content-Type': 'application/json' }
-        });
+        const scriptURL = "https://script.google.com/macros/s/AKfycbx_HlmrqgoweeWmYLlYwH7YXng_frdpdyDW3Rgt44LEBNFz1hpgM90m_lEo93L5uOT3/exec"; // paste your deployed Apps Script URL here
+        const response = await fetch(scriptURL, { method: 'POST', body: formData });
+        const text = await response.text();
 
-        if (response.ok) {
-          successMessage.textContent = "Report submitted successfully!";
-          form.reset();
-        } else {
-          successMessage.textContent = "Error submitting report.";
-        }
+        successMessage.textContent = "Report submitted successfully!";
+        form.reset();
       } catch (error) {
-        successMessage.textContent = "Network error. Please try again.";
+        successMessage.textContent = "Error submitting report.";
       }
     });
   </script>
